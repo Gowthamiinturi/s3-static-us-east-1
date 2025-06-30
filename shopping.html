@@ -1,0 +1,151 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ShopEase – Fashion Hub</title>
+  <style>
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #f8f8f8; }
+    .navbar {
+      background: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1em 2em;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .navbar h1 { margin: 0; color: #333; }
+    .navbar a { margin: 0 10px; text-decoration: none; color: #444; font-weight: bold; }
+    .banner img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .categories {
+      display: flex;
+      justify-content: space-around;
+      padding: 1em;
+      background: white;
+      flex-wrap: wrap;
+    }
+    .categories div {
+      text-align: center;
+      margin: 0.5em;
+    }
+    .categories img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .products {
+      padding: 2em;
+    }
+    .products h2 {
+      text-align: center;
+      color: #333;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.5em;
+      margin-top: 1em;
+    }
+    .product-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      overflow: hidden;
+      text-align: center;
+      padding-bottom: 1em;
+    }
+    .product-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+    .product-card h3 {
+      margin: 0.5em 0 0.2em;
+    }
+    .product-card p {
+      margin: 0;
+      font-weight: bold;
+      color: #e53935;
+    }
+    footer {
+      text-align: center;
+      padding: 1.5em;
+      background: #333;
+      color: white;
+      margin-top: 2em;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <h1>ShopEase</h1>
+    <nav>
+      <a href="#categories">Categories</a>
+      <a href="#products">Products</a>
+    </nav>
+  </header>
+
+  <div class="banner">
+    <img src="https://cdn.pixabay.com/photo/2017/08/06/00/02/fashion-2589647_1280.jpg" alt="Main Banner">
+  </div>
+
+  <section id="categories" class="categories">
+    <div>
+      <img src="https://cdn.pixabay.com/photo/2016/03/27/21/16/t-shirt-1280962_1280.jpg" alt="T-Shirts">
+      <p>T-Shirts</p>
+    </div>
+    <div>
+      <img src="https://cdn.pixabay.com/photo/2016/03/27/21/17/jeans-1280967_1280.jpg" alt="Jeans">
+      <p>Jeans</p>
+    </div>
+    <div>
+      <img src="https://cdn.pixabay.com/photo/2016/12/06/18/27/shoes-1886316_1280.jpg" alt="Shoes">
+      <p>Shoes</p>
+    </div>
+    <div>
+      <img src="https://cdn.pixabay.com/photo/2016/11/22/19/33/bag-1853667_1280.jpg" alt="Bags">
+      <p>Bags</p>
+    </div>
+    <div>
+      <img src="https://cdn.pixabay.com/photo/2017/07/31/11/21/wrist-watch-2561783_1280.jpg" alt="Watches">
+      <p>Watches</p>
+    </div>
+  </section>
+
+  <section id="products" class="products">
+    <h2>Featured Products</h2>
+    <div class="grid">
+      <div class="product-card">
+        <img src="https://cdn.pixabay.com/photo/2020/01/06/19/22/man-4745435_1280.jpg" alt="Jacket">
+        <h3>Winter Jacket</h3>
+        <p>$49.99</p>
+      </div>
+      <div class="product-card">
+        <img src="https://cdn.pixabay.com/photo/2016/03/23/22/22/fashion-1279835_1280.jpg" alt="Dress">
+        <h3>Red Dress</h3>
+        <p>$39.99</p>
+      </div>
+      <div class="product-card">
+        <img src="https://cdn.pixabay.com/photo/2016/03/27/22/16/shoes-1281183_1280.jpg" alt="Sneakers">
+        <h3>Casual Sneakers</h3>
+        <p>$29.99</p>
+      </div>
+      <div class="product-card">
+        <img src="https://cdn.pixabay.com/photo/2016/11/29/03/53/backpack-1868867_1280.jpg" alt="Backpack">
+        <h3>Modern Backpack</h3>
+        <p>$24.99</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    &copy; 2025 ShopEase. All rights reserved.
+  </footer>
+
+</body>
+</html>
