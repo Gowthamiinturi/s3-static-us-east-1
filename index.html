@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SimpleShop — Static Shopping Demo</title>
+  <meta name="description" content="A lightweight static shopping app demo (HTML/CSS/JS) suitable for S3 website hosting." />
+  <style>
+    /* --- Reset & base --- */
+    :root{
+      --bg:#f6f7fb; --card:#fff; --muted:#6b7280; --accent:#0b74de; --radius:12px;
+      --shadow: 0 6px 18px rgba(15,23,42,0.08);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial; background:var(--bg); color:#0f172a}
+    a{color:inherit}
+    .container{max-width:1100px;margin:28px auto;padding:20px}
+
+    /* --- Header --- */
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#0b74de,#7c3aed);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:18px;box-shadow:var(--shadow)}
+    h1{font-size:20px;margin:0}
+    .search{flex:1;margin:0 16px}
+    .search input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e6edf3;background:white}
+
+    /* --- Layout --- */
+    .layout{display:grid;grid-template-columns:250px 1fr;gap:20px}
+    .sidebar{background:var(--card);padding:16px;border-radius:var(--radius);box-shadow:var(--shadow)}
+    .content{display:flex;flex-direction:column;gap:16px}
+
+    /* --- Product grid --- */
+    .products{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+    .card{background:var(--card);padding:12px;border-radius:12px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+    .thumb{height:150px;border-radius:10px;background:#eef2ff;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+    .thumb svg{width:80%;height:80%}
+    .title{font-weight:600;margin:0 0 6px 0}
+    .price{color:var(--accent);font-weight:700}
+    .meta{color:var(--muted);font-size:13px;margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:8px}
+    button{cursor:pointer}
+    .btn{border:0;padding:8px 12px;border-radius:10px;background:var(--accent);color:white;font-weight:600}
+    .btn.ghost{background:transparent;color:var(--accent);border:1px solid #e6edf3}
+
+    /* --- Cart --- */
+    .cart{position:relative}
+    .cart-bubble{position:absolute;right:-8px;top:-8px;background:#ff4d4f;color:white;padding:4px 8px;border-radius:999px;font-size:12px}
+    .cart-drawer{position:fixed;right:20px;bottom:20px;width:320px;background:var(--card);border-radius:14px;padding:12px;box-shadow:0 18px 40px rgba(2,6,23,0.18)}
+    .cart-item{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed #eef2ff}
+    .cart-item:last-child{border-bottom:0}
+    .cart-item .ci-thumb{width:56px;height:44px;border-radius:8px;background:#eef2ff;display:flex;align-items:center;justify-content:center}
+    .cart-footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+
+    /* --- Responsive --- */
+    @media (max-width:880px){.layout{grid-template-columns:1fr}.sidebar{order:2}.search{margin:12px 0}}
+
+    /* small helpers */
+    .muted{color:var(--muted)}
+    .pill{display:inline-block;padding:6px 8px;border-radius:999px;background:#f3f4f6;font-size:13px}
+    label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
+
+    /* animations */
+    .fade-in{animation:fadeIn .28s ease both}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">SS</div>
+        <div>
+          <h1>SimpleShop</h1>
+          <div class="muted" style="font-size:13px">Static shopping demo · HTML / JS</div>
+        </div>
+      </div>
+
+      <div class="search">
+        <input id="search" placeholder="Search products e.g. "T-shirt"" aria-label="Search products" />
+      </div>
+
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="muted">Free shipping over ₹1,499</div>
+        <div class="cart">
+          <button id="openCartBtn" class="btn ghost" aria-haspopup="true" aria-controls="cartDrawer">Cart</button>
+          <span id="cartCount" class="cart-bubble" style="display:none">0</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <strong>Filters</strong>
+          <button id="clearFilters" class="btn ghost">Clear</button>
+        </div>
+
+        <div>
+          <label for="category">Category</label>
+          <select id="category" style="width:100%;padding:8px;border-radius:8px;border:1px solid #eef2f6">
+            <option value="all">All</option>
+            <option value="clothing">Clothing</option>
+            <option value="accessories">Accessories</option>
+            <option value="electronics">Electronics</option>
+          </select>
+        </div>
+
+        <div style="margin-top:12px">
+          <label>Price</label>
+          <div style="display:flex;gap:8px">
+            <input id="minPrice" type="number" placeholder="Min" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef2f6" />
+            <input id="maxPrice" type="number" placeholder="Max" style="flex:1;padding:8px;border-radius:8px;border:1px solid #eef2f6" />
+          </div>
+        </div>
+
+      </aside>
+
+      <section class="content">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="muted" id="resultsInfo">Showing <span id="resultCount">0</span> products</div>
+          <div><button id="sortBtn" class="btn ghost">Sort: Popular</button></div>
+        </div>
+
+        <div id="products" class="products fade-in" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <!-- Cart Drawer (toggle) -->
+    <div id="cartDrawer" class="cart-drawer" role="dialog" aria-label="Shopping cart" style="display:none">
+      <strong>Your cart</strong>
+      <div id="cartItems" style="margin-top:10px;max-height:300px;overflow:auto"></div>
+      <div class="cart-footer">
+        <div style="font-weight:700">Total: <span id="cartTotal">₹0</span></div>
+        <div style="display:flex;gap:8px">
+          <button id="checkoutBtn" class="btn">Checkout</button>
+          <button id="closeCart" class="btn ghost">Close</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // --- Sample product data ---
+    const PRODUCTS = [
+      {id:1,title:'Classic White T‑Shirt',price:499,category:'clothing',desc:'Soft cotton, regular fit',rating:4.5},
+      {id:2,title:'Blue Denim Jeans',price:1599,category:'clothing',desc:'Slim fit with stretch',rating:4.7},
+      {id:3,title:'Leather Wallet',price:799,category:'accessories',desc:'Genuine leather, 4 slots',rating:4.2},
+      {id:4,title:'Wireless Earbuds',price:2499,category:'electronics',desc:'Noise cancelling, 24h battery',rating:4.6},
+      {id:5,title:'Canvas Sneakers',price:1299,category:'clothing',desc:'Lightweight & durable',rating:4.3},
+      {id:6,title:'Sunglasses',price:999,category:'accessories',desc:'UV400 protection',rating:4.1},
+      {id:7,title:'Smart Watch',price:4599,category:'electronics',desc:'Heart-rate & steps',rating:4.4},
+      {id:8,title:'Knitted Scarf',price:599,category:'accessories',desc:'Warm acrylic blend',rating:4.0}
+    ];
+
+    // --- State ---
+    let state = {
+      products: PRODUCTS.slice(),
+      query: '',
+      category: 'all',
+      minPrice: null,
+      maxPrice: null,
+      cart: {} // id -> qty
+    };
+
+    // Persist cart to localStorage
+    function loadCart(){
+      try{
+        const raw = localStorage.getItem('simpleshop_cart');
+        if(raw) state.cart = JSON.parse(raw);
+      }catch(e){console.error(e)}
+    }
+    function saveCart(){ localStorage.setItem('simpleshop_cart', JSON.stringify(state.cart)); }
+
+    // --- Rendering ---
+    const productsEl = document.getElementById('products');
+    const resultCount = document.getElementById('resultCount');
+    function renderProducts(){
+      const filtered = state.products.filter(p => {
+        if(state.category !== 'all' && p.category !== state.category) return false;
+        if(state.minPrice !== null && p.price < state.minPrice) return false;
+        if(state.maxPrice !== null && p.price > state.maxPrice) return false;
+        if(state.query && !p.title.toLowerCase().includes(state.query.toLowerCase()) && !p.desc.toLowerCase().includes(state.query.toLowerCase())) return false;
+        return true;
+      });
+      resultCount.textContent = filtered.length;
+      productsEl.innerHTML = filtered.map(p => `
+        <article class="card" aria-labelledby="p-${p.id}">
+          <div class="thumb" aria-hidden="true">
+            <!-- simple svg placeholder -->
+            <svg viewBox="0 0 100 70" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+              <rect x="6" y="6" width="88" height="58" rx="6" fill="#eef2ff"/>
+              <text x="50" y="40" text-anchor="middle" font-size="9" fill="#7c3aed">₹${p.price}</text>
+            </svg>
+          </div>
+          <h3 id="p-${p.id}" class="title">${p.title}</h3>
+          <div class="muted" style="font-size:13px">${p.desc}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <div>
+              <div class="price">₹${p.price}</div>
+              <div class="muted" style="font-size:13px">⭐ ${p.rating}</div>
+            </div>
+            <div class="meta">
+              <button class="btn" onclick="addToCart(${p.id})" aria-label="Add ${p.title} to cart">Add</button>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    // --- Cart UI ---
+    const cartCountEl = document.getElementById('cartCount');
+    const cartDrawer = document.getElementById('cartDrawer');
+    const cartItemsEl = document.getElementById('cartItems');
+    const cartTotalEl = document.getElementById('cartTotal');
+
+    function updateCartUI(){
+      const items = Object.entries(state.cart).map(([id,qty]) => {
+        const p = PRODUCTS.find(x=>x.id==id);
+        return {...p,qty};
+      });
+      // count
+      const totalQty = items.reduce((s,i)=>s+i.qty,0);
+      if(totalQty>0){cartCountEl.style.display='inline-block';cartCountEl.textContent=totalQty}else cartCountEl.style.display='none';
+
+      // items
+      cartItemsEl.innerHTML = items.length ? items.map(it=>`
+        <div class="cart-item" data-id="${it.id}">
+          <div class="ci-thumb">₹${it.price}</div>
+          <div style="flex:1">
+            <div style="font-weight:600">${it.title}</div>
+            <div class="muted">₹${it.price} · Qty: <strong>${it.qty}</strong></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button class="btn ghost" onclick="changeQty(${it.id},1)">+</button>
+            <button class="btn ghost" onclick="changeQty(${it.id},-1)">-</button>
+          </div>
+        </div>
+      `).join('') : '<div class="muted" style="padding:10px">Your cart is empty</div>';
+
+      const totalPrice = items.reduce((s,i)=>s + i.price*i.qty,0);
+      cartTotalEl.textContent = `₹${totalPrice}`;
+    }
+
+    function addToCart(id){ state.cart[id] = (state.cart[id]||0) + 1; saveCart(); updateCartUI(); showCart(); }
+    function changeQty(id, delta){ if(!state.cart[id]) return; state.cart[id] += delta; if(state.cart[id] <=0) delete state.cart[id]; saveCart(); updateCartUI(); }
+
+    function showCart(){ cartDrawer.style.display='block'; cartDrawer.classList.add('fade-in'); }
+    function hideCart(){ cartDrawer.style.display='none'; }
+
+    // --- Events & Filters ---
+    document.getElementById('search').addEventListener('input', e=>{ state.query = e.target.value; renderProducts(); });
+    document.getElementById('category').addEventListener('change', e=>{ state.category = e.target.value; renderProducts(); });
+    document.getElementById('minPrice').addEventListener('change', e=>{ state.minPrice = e.target.value ? Number(e.target.value) : null; renderProducts(); });
+    document.getElementById('maxPrice').addEventListener('change', e=>{ state.maxPrice = e.target.value ? Number(e.target.value) : null; renderProducts(); });
+    document.getElementById('clearFilters').addEventListener('click', ()=>{ document.getElementById('category').value='all'; document.getElementById('minPrice').value=''; document.getElementById('maxPrice').value=''; state.category='all'; state.minPrice=null; state.maxPrice=null; renderProducts(); });
+
+    document.getElementById('openCartBtn').addEventListener('click', showCart);
+    document.getElementById('closeCart').addEventListener('click', hideCart);
+    document.getElementById('checkoutBtn').addEventListener('click', ()=>{
+      const items = Object.entries(state.cart);
+      if(items.length===0){ alert('Your cart is empty'); return; }
+      // For static hosting demo we just simulate checkout
+      alert('Checkout simulated. Thank you!');
+      state.cart = {}; saveCart(); updateCartUI(); hideCart();
+    });
+
+    // keyboard escape to close cart
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') hideCart(); });
+
+    // init
+    loadCart(); renderProducts(); updateCartUI();
+  </script>
+</body>
+</html>
